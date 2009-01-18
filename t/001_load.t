@@ -8,5 +8,3 @@ BEGIN { use_ok( 'GPS::Point::Filter' ); }
 
 my $object = GPS::Point::Filter->new ();
 isa_ok ($object, 'GPS::Point::Filter');
-
-

@@ -2,7 +2,7 @@ package GPS::Point::Filter;
 use strict;
 use DateTime;
 
-our $VERSION='0.01';
+our $VERSION='0.02';
 
 =head1 NAME
 
@@ -182,17 +182,17 @@ sub addPoint {
     unless $point->VERSION >= 0.10;
   unless (defined $self->point) {
     $self->execute($point);
-    return sprintf("start: %s", DateTime->now->datetime);
+    return $self->status(sprintf("start: %s", DateTime->now->datetime));
   } else {
     my $interlude=$point->time - $self->point->time;
     if ($interlude > $self->interlude) {
       $self->execute($point);
-      return sprintf("interlude: %s", $interlude);
+      return $self->status(sprintf("interlude: %s", $interlude));
     } else {
       my $separation=$point->distance($self->point);
       if ($separation > $self->separation) {
         $self->execute($point);
-        return sprintf("separation: %s", $separation);
+        return $self->status(sprintf("separation: %s", $separation));
       } else {
         my $track=$self->point->track($interlude);
         my $deviation=$point->distance($track);
@@ -200,7 +200,7 @@ sub addPoint {
           if $self->{'debug'};
         if ($deviation > $self->deviation) {
           $self->execute($point);
-          return sprintf("deviation: %s", $deviation);
+          return $self->status(sprintf("deviation: %s", $deviation));
         } else {
           return undef;
         }
@@ -226,6 +226,37 @@ sub point {
   }
   return $self->{'point'};
 }
+
+=head2 count
+
+Sets or returns the count of number of points that have been filtered since the previous filter point;
+
+  $gpf->count;
+
+=cut
+
+sub count {
+  my $self=shift;
+  if (@_) {
+    $self->{'count'}=shift;
+  }
+  return $self->{'count'};
+}
+
+=head2 status
+
+Sets or returns the status of the previous filter point.
+
+=cut
+
+sub status {
+  my $self=shift;
+  if (@_) {
+    $self->{'status'}=shift;
+  }
+  return $self->{'status'};
+}
+
 
 =head1 METHODS (Internal)
 
